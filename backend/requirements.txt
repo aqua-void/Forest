@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+torch
+torchvision
+pillow
+numpy
+matplotlib
+tqdm
+python-multipart
+pydantic-settings
+pytest
+pytest-asyncio
+python-dotenv
+requests
+groq
