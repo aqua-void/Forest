@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # from fastapi import FastAPI, File, UploadFile
 # from fastapi.responses import JSONResponse
 # from pydantic import BaseModel
@@ -193,6 +194,10 @@
 from fastapi import FastAPI, File, UploadFile, WebSocket, WebSocketDisconnect, BackgroundTasks
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+=======
+from fastapi import FastAPI, File, UploadFile
+from fastapi.responses import JSONResponse
+>>>>>>> 3b786080a8712de78dbd9dc393d35353bfd80163
 from pydantic import BaseModel
 import sys
 import os
@@ -201,6 +206,7 @@ from pathlib import Path
 import requests
 import tempfile
 import json
+<<<<<<< HEAD
 import uuid
 import asyncio
 from datetime import datetime
@@ -616,6 +622,44 @@ async def get_user_reports(user_id: str):
 async def get_disease_from_url(image_data: ImageURL):
     """
     Original endpoint for direct URL analysis
+=======
+from fastapi import HTTPException
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv(dotenv_path=Path(__file__).parent / ".env")
+
+
+# Add ML directory to path so we can import forest
+# Since we're in backend/, ML is at backend/ML
+sys.path.insert(0, str(Path(__file__).parent / "ML"))
+
+from groq import Groq
+from forest import predict
+
+# Request model for URL
+class ImageURL(BaseModel):
+    url: str
+
+app = FastAPI()
+
+
+@app.get("/")
+async def root():
+    return {"message": "Forest Disease Detection API", "version": "1.0"}
+
+
+@app.post("/getDisease")
+async def get_disease_from_url(image_data: ImageURL):
+    """
+    Get disease prediction from an image URL and detailed disease info
+    Flow:
+    1. Download image from URL
+    2. Send to model for prediction
+    3. Get detailed disease info from AI
+    Accepts JSON body with 'url' field: {"url": "https://example.com/image.jpg"}
+    Returns JSON with crop, disease, confidence, and detailed disease info
+>>>>>>> 3b786080a8712de78dbd9dc393d35353bfd80163
     """
     tmp_path = None
     try:
@@ -679,7 +723,74 @@ async def get_disease_from_url(image_data: ImageURL):
             except OSError:
                 pass
 
+<<<<<<< HEAD
 # Disease info endpoint
+=======
+# Initialize Groq client with API key from environment
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+if not GROQ_API_KEY:
+    raise ValueError("GROQ_API_KEY environment variable not set in .env file")
+groq_client = Groq(api_key=GROQ_API_KEY)
+
+
+class DiseaseRequest(BaseModel):
+    disease: str
+
+
+# Helper function to get disease info from AI
+async def get_disease_info_internal(disease_name: str):
+    """Internal function to get disease info from AI"""
+    prompt = f"""You are a helpful assistant that provides disease information.
+Return ONLY a valid JSON object with this exact structure (no other text):
+{{
+  "disease":"{disease_name}",
+  "info":"Brief description of the disease",
+  "prevention":"Prevention methods",
+  "cause":"What causes this disease",
+  "recommendedProduct":[{{"name":"Product name","image":"image_url"}}],
+  "symptoms":["symptom1","symptom2"],
+  "treatment":"Treatment recommendations",
+  "other":"Any other relevant information"
+}}"""
+
+    try:
+        response = groq_client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[{"role": "user", "content": prompt}]
+        )
+
+        ai_output = response.choices[0].message.content.strip()
+        
+        # Extract JSON from the response
+        json_match = re.search(r'\{.*\}', ai_output, re.DOTALL)
+        
+        if json_match:
+            json_str = json_match.group(0)
+        else:
+            json_str = ai_output
+        
+        # Validate and parse JSON
+        try:
+            data = json.loads(json_str)
+            return data
+        except json.JSONDecodeError:
+            # Return structured error if JSON parsing fails
+            return {
+                "success": False,
+                "disease": disease_name,
+                "error": "Invalid JSON from AI",
+                "raw_output": ai_output[:300]
+            }
+
+    except Exception as e:
+        return {
+            "success": False,
+            "disease": disease_name,
+            "error": f"Failed to get disease info: {str(e)}"
+        }
+
+
+>>>>>>> 3b786080a8712de78dbd9dc393d35353bfd80163
 @app.post("/disease")
 async def get_disease_info(request: DiseaseRequest):
     """
@@ -699,6 +810,7 @@ async def get_disease_info(request: DiseaseRequest):
         content={"success": True, "data": disease_info}
     )
 
+<<<<<<< HEAD
 # List all active reports (admin only)
 @app.get("/reports")
 async def list_all_reports():
@@ -722,3 +834,5 @@ async def startup_event():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
+=======
+>>>>>>> 3b786080a8712de78dbd9dc393d35353bfd80163

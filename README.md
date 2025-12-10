@@ -1,5 +1,6 @@
 # Forest
 AI-powered crop disease prediction and prevention platform. Detects, forecasts, and protects farms before outbreaks occur.
+<<<<<<< HEAD
 
 
 # Backend README
@@ -174,3 +175,5 @@ npm start
 ---
 
 ### ✨ You're all set! Let me know if you want badges, diagrams, or GitHub workflow setup.
+=======
+>>>>>>> 3b786080a8712de78dbd9dc393d35353bfd80163

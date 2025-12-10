@@ -1,10 +1,16 @@
 import torch
 from torchvision import transforms, models
 from PIL import Image
+<<<<<<< HEAD
 from pathlib import Path
 
 # PATHS
 MODEL_PATH = Path(__file__).parent / "forest_model.pth"
+=======
+
+# PATHS
+MODEL_PATH = "forest_model.pth"
+>>>>>>> 3b786080a8712de78dbd9dc393d35353bfd80163
 
 # Mapping: full classes → simplified crop + disease
 CLASS_MAP = {
@@ -43,7 +49,11 @@ CLASS_MAP = {
 classes = list(CLASS_MAP.keys())
 model = models.mobilenet_v3_small(weights=None)
 model.classifier[3] = torch.nn.Linear(model.classifier[3].in_features, len(classes))
+<<<<<<< HEAD
 model.load_state_dict(torch.load(str(MODEL_PATH), map_location="cpu"))
+=======
+model.load_state_dict(torch.load(MODEL_PATH, map_location="cpu"))
+>>>>>>> 3b786080a8712de78dbd9dc393d35353bfd80163
 model.eval()
 
 # Transforms
@@ -64,4 +74,15 @@ def predict(img_path):
         conf, pred = torch.max(probs, 1)
     
     crop, disease = CLASS_MAP[classes[pred.item()]]
+<<<<<<< HEAD
     return crop, disease, conf.item()
+=======
+    return crop, disease, conf.item()
+
+# Example usage
+test_image = r"D:\forest\test\test\AppleCedarRust3.JPG"
+crop, disease, confidence = predict(test_image)
+res = predict(test_image)
+print(res)
+print(f"Crop: {crop} | Disease: {disease} | Confidence: {confidence*100:.2f}%")
+>>>>>>> 3b786080a8712de78dbd9dc393d35353bfd80163
